@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import Modelo.*;
 import Vista.*;
 import java.io.Console;
+import javax.swing.JOptionPane;
 
 public class Controlador implements ActionListener {
 
@@ -15,116 +16,70 @@ public class Controlador implements ActionListener {
     TCubo modeloCubo;
     TEsfera modeloEsfera;
 
-    public Controlador() {        
+    public Controlador() {
         view = new Salario();
-        //CambiarTitulo();
-        view.getComboTipoEmpleado().addActionListener(this);
-        //vista.getBCalcular().addActionListener(this);
+        view.getComboTypeEmployee().addActionListener(this);
+        view.getButtonCalculate().addActionListener(this);
 
     }
 
-    public void Run() {      
-        
+    public void Run() {
+
         view.setResizable(false);
         view.setLocationRelativeTo(null);
         view.setTitle("Calculo Salario UNICOR");
         view.setVisible(true);
     }
 
-    private TEsfera CrarEsfera() {
-        TEsfera Esf = new TEsfera();
-        Esf.setRadio(Float.parseFloat(vista.getCTLado().getText()));
-        return Esf;
+    private Integer getValueTypeSalary() {
+        Integer[] salarys = {0, 22000, 22000, 37770, 51103};
+        Integer salary = salarys[view.getComboTypeEmployee().getSelectedIndex()];
+        return salary;
     }
 
-    private TCubo CrearCubo() {
-        TCubo Cub = new TCubo();
-        Cub.setLado(Float.parseFloat(vista.getCTLado().getText()));
-        return Cub;
-
+    private Integer getValueBond() {
+        Integer[] bonds = {0, 40, 0, 0, 0};
+        Integer bond = bonds[view.getComboTypeEmployee().getSelectedIndex()];
+        return bond;
     }
 
-    private TCilindro CrearCilindro() {
-        TCilindro Cil = new TCilindro();
-        Cil.setRadio(Float.parseFloat(vista.getCTLado().getText()));
-        Cil.setAltura(Float.parseFloat(vista.getCTRadio().getText()));
-        return Cil;
+    private void calculateSalary() {
 
-    }
+        String pointSalary = view.getInputPointSalary().getText();
 
-    private TCono CrearCono() {
-        TCono Con = new TCono();
-        Con.setRadio(Float.parseFloat(vista.getCTLado().getText()));
-        Con.setAltura(Float.parseFloat(vista.getCTRadio().getText()));
-        return Con;
-
-    }
-
-    private void Mostrar(ISolido Sol) {
-        vista.getCTArea().setText(String.format("%.3f", Sol.AreaTotal()));
-        vista.getCTVolumen().setText(String.format("%.3f", Sol.Volumen()));
-
-    }
-
-    public void CambiarTitulo() {
-        vista.getjLabel2().setText("");
-        vista.getjLabel3().setText("");
-        switch (vista.getComboSolido().getSelectedIndex()) {
-            case 0:
-                vista.getjLabel2().setText("Lado");
-                break;
-            case 1:
-                vista.getjLabel2().setText("Radio");
-            case 2:
-            case 3:
-                vista.getjLabel2().setText("Radio");
-                vista.getjLabel3().setText("Altura");
-                break;
-
-        }
-        if (vista.getComboSolido().getSelectedIndex() < 2) {
-            vista.getjLabel3().setText("");
-            vista.getCTRadio().setVisible(false);
-
+        if (!pointSalary.equals("")) {
+            Integer typeSalary = getValueTypeSalary();
+            if (typeSalary > 0) {
+                Integer bonds = getValueBond() + Integer.parseInt(pointSalary);
+                Integer salary = getValueTypeSalary() * bonds;
+                
+                Integer deduction = Integer.parseInt(view.getInputDeduction().getText());
+                System.out.println(deduction);
+                float porcDeduction = (float)(deduction/100);
+                System.out.println((float)porcDeduction);
+                float salaryDeduction = salary * porcDeduction;
+                System.out.println(salaryDeduction);
+                float salaryNeto = (float)(salary - salaryDeduction);
+                System.out.print(salaryNeto);
+                view.getInputSalary().setText(salaryNeto+"");
+            } else {
+                JOptionPane.showMessageDialog(view, "Es requerido Valor Punto Salarial");
+            }            
         } else {
-            vista.getCTRadio().setVisible(true);
+            JOptionPane.showMessageDialog(view, "Es requerido Puntos Salariales");
         }
-
-    }
-
-    public void Calcular() {
-        ISolido Sol;
-        switch (vista.getComboSolido().getSelectedIndex()) {
-            case 0:
-                Sol = CrearCubo();
-                break;
-            case 1:
-                Sol = CrarEsfera();
-                break;
-            case 2:
-                Sol = CrearCilindro();
-                break;
-            case 3:
-                Sol = CrearCono();
-                break;
-            default:
-                Sol = null;
-
-        }
-        Mostrar(Sol);
     }
 
     @Override
-
     public void actionPerformed(ActionEvent e) {
         System.out.println(e);
-        /*modeloCilindro = new Modelo.TCilindro();
-        if (e.getSource() == vista.getComboSolido()) {
-            CambiarTitulo();
+        if (e.getSource() == view.getComboTypeEmployee()) {
+            view.getInputValuePoint().setText(getValueTypeSalary().toString());
+            view.getInputBond().setText(getValueBond().toString());
         }
-        if (e.getSource() == vista.getBCalcular()) {
-            Calcular();
-        } */     
 
+        if (e.getSource() == view.getButtonCalculate()) {
+            calculateSalary();
+        }
     }
 }
